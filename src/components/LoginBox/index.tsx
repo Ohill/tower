@@ -11,7 +11,6 @@ import {
     withStyles,
 } from '@material-ui/core';
 import LockIcon from '@material-ui/icons/LockOutlined';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 const styles = (theme: Theme) => createStyles({

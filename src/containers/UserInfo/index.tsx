@@ -47,6 +47,10 @@ interface UserInfoState {
     nameLabel: string;
     valueLabel: string;
     scopeLabel: string;
+    order: string;
+    orderBy: string;
+    page: number;
+    rowsPerPage: number;
 }
 
 type Props = ReduxProps & DispatchProps & RouteProps & OwnProps;
@@ -61,8 +65,20 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
             nameLabel: '',
             valueLabel: '',
             scopeLabel: 'public',
+            order: 'asc',
+            orderBy: this.documentsRows[0].key,
+            page: 0,
+            rowsPerPage: 15,
         };
     }
+
+    private documentsRows = [
+        { key: 'doc_type', alignRight: false, label: 'Doc type' },
+        { key: 'created_at', alignRight: true, label: 'Created_at' },
+        { key: 'doc_number', alignRight: true, label: 'Doc number' },
+        { key: 'doc_expire', alignRight: true, label: 'Doc expire' },
+        { key: 'upload', alignRight: true, label: 'Photos' },
+    ];
 
     public componentDidMount() {
         this.props.getUserData({uid: this.props.match.params.uid});
@@ -75,12 +91,17 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
             nameLabel,
             valueLabel,
             scopeLabel,
+            order,
+            orderBy,
+            page,
+            rowsPerPage,
         } = this.state;
 
         return (
             <Layout logout={this.userLogout}>
                 { this.props.userData
                     ? (<UserData
+                            documentsRows={this.documentsRows}
                             addNewLabel={this.addLabel}
                             editLabel={this.editLabel}
                             changeLabelName={this.changeNameForNewLabel}
@@ -99,6 +120,11 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
                             openAddLabelModal={this.handleOpenAddLabelModal}
                             openEditLabelModal={this.handleOpenEditLabelModal}
                             user={this.props.userData}
+                            order={order}
+                            orderBy={orderBy}
+                            page={page}
+                            rowsPerPage={rowsPerPage}
+                            handleChangePage={this.handleChangePage}
                         />
                     ) : 'Loading'
                 }
@@ -198,6 +224,12 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
     private changeOTP = (value: boolean) => {
         const { uid } = this.props.userData;
         this.props.changeUserOTP({uid: uid, otp: value});
+    };
+
+    private handleChangePage = (page: number) => {
+        this.setState({
+            page: Number(page),
+        });
     };
 }
 

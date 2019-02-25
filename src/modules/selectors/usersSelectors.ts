@@ -11,3 +11,6 @@ export const selectUsersLoading = (state: AppState): UsersState['loading'] =>
 
 export const selectCurrentUser = (state: AppState): UsersState['currentUser'] =>
     state.users.currentUser;
+
+export const selectUsersTotal = (state: AppState): UsersState['usersTotal'] =>
+    state.users.usersTotal;

@@ -14,6 +14,7 @@ export interface UsersState {
     currentUser: UserInterface | undefined;
     loadingCurrentUser: boolean;
     error?: string;
+    usersTotal: number;
 }
 
 const initial: UsersState = {
@@ -21,6 +22,7 @@ const initial: UsersState = {
     currentUser: undefined,
     loadingCurrentUser: false,
     users: [],
+    usersTotal: 0,
 }
 
 export const usersReducer = (state = initial, action: UsersAction) => {
@@ -34,13 +36,15 @@ export const usersReducer = (state = initial, action: UsersAction) => {
           return {
               ...state,
               loading: false,
-              users: action.payload,
+              users: action.payload.users,
+              usersTotal: action.payload.total,
           };
       case GET_USERS_FAILURE:
           return {
               ...state,
               success: false,
               error: action.payload.message,
+              usersTotal: 0,
           };
       case GET_CURRENT_USER_FETCH:
           return {

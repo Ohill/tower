@@ -5,7 +5,7 @@ import { API } from '../../../api';
 export function* getCurrentUserSaga(action: GetCurrentUserFetch) {
     try {
         const user = yield call(API.get(), '/resource/users/me');
-        yield put(getCurrentUserData(user));
+        yield put(getCurrentUserData(user.data));
     } catch (error) {
         yield put(getCurrentUserError(error));
     }

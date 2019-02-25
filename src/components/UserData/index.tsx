@@ -12,11 +12,20 @@ import {
 } from '@material-ui/core';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import React from "react";
-import { EditLabel, EnchancedTable } from '../';
+import {
+    EditLabel,
+    InfoTable,
+} from '../';
 import {
     convertToUTCTime,
     findPhone,
 } from '../../helpers';
+
+export interface TableHeaderItemInterface {
+    key: string;
+    alignRight: boolean;
+    label: string;
+}
 
 export interface UserDataProps {
     addNewLabel: () => void;
@@ -37,6 +46,12 @@ export interface UserDataProps {
     openAddLabelModal: () => void;
     openEditLabelModal: (key: string, value: string, scope: string) => void;
     user: any;
+    order: string;
+    orderBy: string;
+    page: number;
+    rowsPerPage: number;
+    handleChangePage: (page: any) => void;
+    documentsRows: TableHeaderItemInterface[];
 }
 
 const styles = (theme: Theme) => createStyles({
@@ -91,13 +106,7 @@ const roleTypes = [
     },
 ];
 
-const documentsRows = [
-    { key: 'doc_type', alignRight: false, label: 'Doc type' },
-    { key: 'created_at', alignRight: true, label: 'Created_at' },
-    { key: 'doc_number', alignRight: true, label: 'Doc number' },
-    { key: 'doc_expire', alignRight: true, label: 'Doc expire' },
-    { key: 'upload', alignRight: true, label: 'Photos' },
-];
+
 
 const countries = require('country-data').countries;
 
@@ -122,6 +131,9 @@ class UserDataComponent extends React.Component<Props> {
             newLabelName,
             newLabelValue,
             newLabelScope,
+            order,
+            orderBy,
+            page,
         } = this.props;
 
         return (
@@ -331,7 +343,17 @@ class UserDataComponent extends React.Component<Props> {
                     <Typography variant="h5" gutterBottom component="h5" style={{ marginTop: 40 }}>
                         Documents
                     </Typography>
-                    <EnchancedTable rows={documentsRows} data={user.documents} />
+                    <InfoTable
+                        dataLength={this.props.documentsRows.length}
+                        rows={this.props.documentsRows}
+                        data={user.documents}
+                        order={order}
+                        orderBy={orderBy}
+                        page={page}
+                        rowsPerPage={user.documents.length}
+                        handleChangePage={this.props.handleChangePage}
+                        hidePagination={true}
+                    />
                 </Paper>
                 <Grid container justify={"center"} spacing={40}>
                     <Grid item>
@@ -410,7 +432,7 @@ class UserDataComponent extends React.Component<Props> {
     private openEditLabelModal = (key: string, value: string, scope: string) => {
         this.props.openEditLabelModal(key, value, scope);
     };
-                                        
+
     private showMetadata = (metadata: any) => {
         let grids = [];
         let res = [];

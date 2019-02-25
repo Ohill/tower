@@ -31,7 +31,6 @@ class LayoutComponent extends React.Component<Props, object> {
     public render() {
         const {
             classes,
-            theme,
             children
         } = this.props;
 
