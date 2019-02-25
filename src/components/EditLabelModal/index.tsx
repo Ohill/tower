@@ -65,7 +65,6 @@ class EditLabelModal extends React.Component<Props> {
     public render() {
         const {
             classes,
-            open,
             name,
             value,
             scope,

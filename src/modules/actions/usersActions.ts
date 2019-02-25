@@ -26,6 +26,10 @@ export interface UserInterface {
 
 export interface GetUsersFetch {
     type: typeof GET_USERS_FETCH,
+    payload?: {
+        page: number;
+        limit: number;
+    },
 }
 
 export interface GetUsersSuccess {
@@ -59,8 +63,9 @@ export type UsersAction = GetUsersFetch
     | GetCurrentUserData
     | GetCurrentUserError;
 
-export const getUsers = (): GetUsersFetch => ({
+export const getUsers = (payload: GetUsersFetch['payload']): GetUsersFetch => ({
     type: GET_USERS_FETCH,
+    payload,
 });
 
 export const getUsersData = (payload: GetUsersSuccess['payload']): GetUsersSuccess => ({
