@@ -27,8 +27,11 @@ export interface ApiVariety {
     gateway: string;
 }
 
-interface Window {
-    env: any;
+export interface Window {
+    env: {
+        authUrl: string;
+        tablePageLimit: number;
+    }
 }
 
 const api: ApiVariety = {
@@ -59,16 +62,19 @@ const buildRequest = (request: Request) => {
     return requestConfig;
 };
 
-const defaultResponse: Partial<AxiosError['response']> = {
+export const defaultResponse: Partial<AxiosError['response']> = {
     status: 500,
-    statusText: 'Server Error',
+    data: {
+        errors: ['Server error'],
+    },
 };
 
-const formatError = (responseError: AxiosError) => {
+export const formatError = (responseError: AxiosError) => {
     const response = responseError.response || defaultResponse;
+    const errors = response.data && response.data.errors;
     return {
         code: response.status,
-        message: response.data.error ? response.data.error : response.statusText,
+        message: errors,
     };
 };
 
@@ -78,7 +84,7 @@ export const makeRequest = (request: Request) => {
     return new Promise((resolve, reject) => {
         const axiosRequest: AxiosPromise = axios(requestConfig);
         axiosRequest
-            .then((response: AxiosResponse) => resolve(response.data))
+            .then((response: AxiosResponse) => resolve(response))
             .catch((error: AxiosError) => {
                 reject(formatError(error));
             });

@@ -47,6 +47,9 @@ interface UserInfoState {
     nameLabel: string;
     valueLabel: string;
     scopeLabel: string;
+    page: number;
+    rowsPerPage: number;
+    showMore: boolean;
 }
 
 type Props = ReduxProps & DispatchProps & RouteProps & OwnProps;
@@ -61,8 +64,19 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
             nameLabel: '',
             valueLabel: '',
             scopeLabel: 'public',
+            page: 0,
+            rowsPerPage: 15,
+            showMore: false,
         };
     }
+
+    private documentsRows = [
+        { key: 'doc_type', alignRight: false, label: 'Doc type' },
+        { key: 'created_at', alignRight: true, label: 'Created_at' },
+        { key: 'doc_number', alignRight: true, label: 'Doc number' },
+        { key: 'doc_expire', alignRight: true, label: 'Doc expire' },
+        { key: 'upload', alignRight: true, label: 'Photos' },
+    ];
 
     public componentDidMount() {
         this.props.getUserData({uid: this.props.match.params.uid});
@@ -75,22 +89,25 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
             nameLabel,
             valueLabel,
             scopeLabel,
+            page,
+            rowsPerPage,
         } = this.state;
 
         return (
             <Layout logout={this.userLogout}>
                 { this.props.userData
                     ? (<UserData
+                            documentsRows={this.documentsRows}
                             addNewLabel={this.addLabel}
                             editLabel={this.editLabel}
                             changeLabelName={this.changeNameForNewLabel}
                             changeLabelScope={this.changeScopeForNewLabel}
                             changeLabelValue={this.changeValueForNewLabel}
-                            changeState={this.changeState}
-                            changeRole={this.changeRole}
-                            changeOTP={this.changeOTP}
                             closeModal={this.handleCloseModal}
                             deleteUserLabel={this.deleteLabel}
+                            handleChangeUserState={this.handleChangeUserState}
+                            handleChangeRole={this.handleChangeRole}
+                            handleChangeUserOTP={this.handleChangeUserOTP}
                             newLabelName={nameLabel}
                             newLabelScope={scopeLabel}
                             newLabelValue={valueLabel}
@@ -99,6 +116,11 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
                             openAddLabelModal={this.handleOpenAddLabelModal}
                             openEditLabelModal={this.handleOpenEditLabelModal}
                             user={this.props.userData}
+                            page={page}
+                            rowsPerPage={rowsPerPage}
+                            handleChangePage={this.handleChangePage}
+                            showMore={this.state.showMore}
+                            showMoreUserInfo={this.showMoreUserInfo}
                         />
                     ) : 'Loading'
                 }
@@ -184,20 +206,34 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
         this.changeValueForNewLabel('');
     };
 
-
-    private changeState = (value: string) => {
+    private handleChangeUserState = (e: any) => {
         const { uid } = this.props.userData;
-        this.props.changeUserState({uid: uid, state: value});
+        this.props.changeUserState({uid: uid, state : e.target.value});
+
     };
 
-    private changeRole = (value: string) => {
+    private handleChangeRole = (e: any) => {
         const { uid } = this.props.userData;
-        this.props.changeUserRole({uid: uid, role: value});
+        this.props.changeUserRole({uid: uid, role: e.target.value});
     };
 
-    private changeOTP = (value: boolean) => {
-        const { uid } = this.props.userData;
-        this.props.changeUserOTP({uid: uid, otp: value});
+    private handleChangeUserOTP = (e: any) => {
+        if(!e.target.checked){
+            const { uid } = this.props.userData;
+            this.props.changeUserOTP({uid: uid, otp: e.target.checked});
+        } else {
+            alert('2FA can only be enabled by the user');
+        }
+    };
+
+    private showMoreUserInfo = (e: any) => {
+        this.setState({ showMore: !this.state.showMore });
+    };
+
+    private handleChangePage = (page: number) => {
+        this.setState({
+            page: Number(page),
+        });
     };
 }
 

@@ -12,11 +12,20 @@ import {
 } from '@material-ui/core';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import React from "react";
-import { EditLabel, EnchancedTable } from '../';
+import {
+    EditLabel,
+    InfoTable,
+} from '../';
 import {
     convertToUTCTime,
     findPhone,
 } from '../../helpers';
+
+export interface TableHeaderItemInterface {
+    key: string;
+    alignRight: boolean;
+    label: string;
+}
 
 export interface UserDataProps {
     addNewLabel: () => void;
@@ -24,11 +33,11 @@ export interface UserDataProps {
     changeLabelName: (value: string) => void;
     changeLabelScope: (value: string) => void;
     changeLabelValue: (value: string) => void;
-    changeState: (value: string) => void;
-    changeRole: (value: string) => void;
-    changeOTP: (value: boolean) => void;
     closeModal: () => void;
     deleteUserLabel: (uid: string, key: string, scope: string) => void;
+    handleChangeUserState: (e: any) => void;
+    handleChangeRole: (e: any) => void;
+    handleChangeUserOTP: (e: any) => void;
     newLabelName: string;
     newLabelScope: string;
     newLabelValue: string;
@@ -37,6 +46,12 @@ export interface UserDataProps {
     openAddLabelModal: () => void;
     openEditLabelModal: (key: string, value: string, scope: string) => void;
     user: any;
+    page: number;
+    rowsPerPage: number;
+    handleChangePage: (page: any) => void;
+    documentsRows: TableHeaderItemInterface[];
+    showMore: boolean;
+    showMoreUserInfo: (e: any) => void;
 }
 
 const styles = (theme: Theme) => createStyles({
@@ -91,13 +106,7 @@ const roleTypes = [
     },
 ];
 
-const documentsRows = [
-    { key: 'doc_type', alignRight: false, label: 'Doc type' },
-    { key: 'created_at', alignRight: true, label: 'Created_at' },
-    { key: 'doc_number', alignRight: true, label: 'Doc number' },
-    { key: 'doc_expire', alignRight: true, label: 'Doc expire' },
-    { key: 'upload', alignRight: true, label: 'Photos' },
-];
+
 
 const countries = require('country-data').countries;
 
@@ -108,12 +117,6 @@ interface StyleProps extends WithStyles<typeof styles> {
 type Props = StyleProps & UserDataProps;
 
 class UserDataComponent extends React.Component<Props> {
-    state = {
-        userState: this.props.user.state,
-        role: this.props.user.role,
-        otp: this.props.user.otp,
-        showMore: false,
-    };
 
     public render() {
         const {
@@ -122,6 +125,11 @@ class UserDataComponent extends React.Component<Props> {
             newLabelName,
             newLabelValue,
             newLabelScope,
+            page,
+            handleChangeUserState,
+            handleChangeRole,
+            handleChangeUserOTP,
+            showMore,
         } = this.props;
 
         return (
@@ -170,11 +178,11 @@ class UserDataComponent extends React.Component<Props> {
                             <Typography variant="h6" gutterBottom component="h6">
                                 <TextField
                                     select
-                                    value={this.state.userState}
+                                    value={user.state}
                                     label="State"
                                     variant="outlined"
                                     className={classes.textField}
-                                    onChange={this.changeUserState}
+                                    onChange={handleChangeUserState}
                                     SelectProps={{
                                         native: true,
                                         MenuProps: {
@@ -220,11 +228,11 @@ class UserDataComponent extends React.Component<Props> {
                             <Typography variant="h6" gutterBottom component="h6">
                                 <TextField
                                     select
-                                    value={this.state.role}
+                                    value={user.role}
                                     label="Role"
                                     variant="outlined"
                                     className={classes.textField}
-                                    onChange={this.changeUserRole}
+                                    onChange={handleChangeRole}
                                     SelectProps={{
                                         native: true,
                                         MenuProps: {
@@ -259,7 +267,7 @@ class UserDataComponent extends React.Component<Props> {
                             </Typography>
                         </Grid>
                         <Grid item xs={3}>
-                            {user.profile === null || this.state.showMore ? (
+                            {user.profile === null || showMore ? (
                                 <><Typography variant="h6" gutterBottom component="h6">
                                   <b>Postcode</b>
                                 </Typography>
@@ -267,7 +275,7 @@ class UserDataComponent extends React.Component<Props> {
                                     {user.profile !== null ? user.profile.postcode : '-'}
                                 </Typography></>
                                 ) : (
-                                <Button onClick={(e) => this.showMoreUserInfo(e)} style={{ marginTop: 10 }}>
+                                <Button onClick={(e) => this.props.showMoreUserInfo(e)} style={{ marginTop: 10 }}>
                                     <Typography variant="h6" component="h6" style={{ color: "#3598D5" }}>
                                         MORE USER INFO
                                     </Typography>
@@ -280,19 +288,19 @@ class UserDataComponent extends React.Component<Props> {
                                     <b>Authorization 2FA</b>
                                 </Typography>
                                 <Typography variant="h6" gutterBottom component="h6" style={{ color: "#757575" }}>
-                                    {this.state.otp ? 'Enable' : 'Disable'}
+                                    {user.otp ? 'Enable' : 'Disable'}
                                 </Typography>
                             </Grid>
                             <Grid item>
                                 <Switch
-                                    checked={this.state.otp}
-                                    onChange={this.changeUserOTP}
+                                    checked={user.otp}
+                                    onChange={handleChangeUserOTP}
                                     color="primary"
                                 />
                             </Grid>
                         </Grid>
                     </Grid>
-                    {this.state.showMore && user.profile !== null ? this.showMetadata(user.profile.metadata) : null}
+                    {showMore && user.profile !== null ? this.showMetadata(user.profile.metadata) : null}
                     <Typography variant="h5" gutterBottom component="h5">
                         Labels
                     </Typography>
@@ -331,7 +339,15 @@ class UserDataComponent extends React.Component<Props> {
                     <Typography variant="h5" gutterBottom component="h5" style={{ marginTop: 40 }}>
                         Documents
                     </Typography>
-                    <EnchancedTable rows={documentsRows} data={user.documents} />
+                    <InfoTable
+                        dataLength={this.props.documentsRows.length}
+                        rows={this.props.documentsRows}
+                        data={user.documents}
+                        page={page}
+                        rowsPerPage={user.documents.length}
+                        handleChangePage={this.props.handleChangePage}
+                        hidePagination={true}
+                    />
                 </Paper>
                 <Grid container justify={"center"} spacing={40}>
                     <Grid item>
@@ -410,7 +426,7 @@ class UserDataComponent extends React.Component<Props> {
     private openEditLabelModal = (key: string, value: string, scope: string) => {
         this.props.openEditLabelModal(key, value, scope);
     };
-                                        
+
     private showMetadata = (metadata: any) => {
         let grids = [];
         let res = [];
@@ -432,7 +448,7 @@ class UserDataComponent extends React.Component<Props> {
         }
         grids.push(
             <Grid item xs={3} key='less'>
-                <Button onClick={(e) => this.showMoreUserInfo(e)} style={{ marginTop: 10 }}>
+                <Button onClick={(e) => this.props.showMoreUserInfo(e)} style={{ marginTop: 10 }}>
                     <Typography variant="h6" component="h6" style={{ color: "#3598D5" }}>
                         LESS USER INFO
                     </Typography>
@@ -475,29 +491,6 @@ class UserDataComponent extends React.Component<Props> {
 
     private deleteLabel = (uid: string, key: string, scope: string) => {
         this.props.deleteUserLabel(uid, key, scope);
-    };
-
-    private changeUserState = (e: any) => {
-        this.props.changeState(e.target.value);
-        this.setState({ userState: e.target.value });
-    };
-
-    private changeUserRole = (e: any) => {
-        this.props.changeRole(e.target.value);
-        this.setState({ role: e.target.value });
-    };
-
-    private changeUserOTP = (e: any) => {
-        if (this.state.otp) {
-            this.props.changeOTP(e.target.checked);
-            this.setState({otp: e.target.checked});
-        } else {
-            alert('2FA can only be enabled by the user');
-        }
-    };
-
-    private showMoreUserInfo = (e: any) => {
-        this.setState({ showMore: !this.state.showMore });
     };
 
     private displayCountry = (code: string) => {

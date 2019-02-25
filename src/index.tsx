@@ -4,8 +4,7 @@ import { Provider } from 'react-redux';
 import { applyMiddleware, compose, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import App from './App';
-import { appReducer } from './modules/reducers';
-import { rootSaga } from './modules';
+import { appReducer, rootSaga } from './modules';
 import * as serviceWorker from './serviceWorker';
 
 const composeEnhancer: typeof compose = (window as any)
@@ -16,7 +15,7 @@ const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
     appReducer,
     composeEnhancer(
-      applyMiddleware(sagaMiddleware)
+        applyMiddleware(sagaMiddleware)
     ),
 );
 
