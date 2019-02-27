@@ -7,6 +7,7 @@ import {
 import {
     AppState,
     getUsers,
+    getDataByFilter,
     selectUsers,
     selectUsersTotal,
     UserInterface,
@@ -32,6 +33,7 @@ interface ReduxProps {
 
 interface DispatchProps {
     getUsers: typeof getUsers;
+    getDataByFilter: typeof getDataByFilter;
 }
 
 type Props = ReduxProps & DispatchProps;
@@ -98,6 +100,7 @@ const mapStateToProps: MapStateToProps<ReduxProps, {}, AppState> =
 const mapDispatchToProps: MapDispatchToPropsFunction<DispatchProps, {}> =
     dispatch => ({
         getUsers: payload => dispatch(getUsers(payload)),
+        getDataByFilter: payload => dispatch(getDataByFilter(payload)),
     });
 
 export const UsersTableContainer = connect(mapStateToProps, mapDispatchToProps)(DashboardUserTable);

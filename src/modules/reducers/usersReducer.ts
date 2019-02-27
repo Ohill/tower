@@ -3,6 +3,7 @@ import {
     GET_CURRENT_USER_FETCH,
     GET_CURRENT_USER_DATA,
     GET_CURRENT_USER_ERROR,
+    GET_DATA_BY_FILTER_FETCH,
     GET_USERS_FETCH,
     GET_USERS_SUCCESS,
     GET_USERS_FAILURE,
@@ -45,6 +46,11 @@ export const usersReducer = (state = initial, action: UsersAction) => {
               success: false,
               error: action.payload.message,
               usersTotal: 0,
+          };
+      case GET_DATA_BY_FILTER_FETCH:
+          return {
+              ...state,
+              loading: true,
           };
       case GET_CURRENT_USER_FETCH:
           return {

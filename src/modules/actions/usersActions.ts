@@ -2,6 +2,7 @@ import {
     GET_CURRENT_USER_FETCH,
     GET_CURRENT_USER_DATA,
     GET_CURRENT_USER_ERROR,
+    GET_DATA_BY_FILTER_FETCH,
     GET_USERS_FETCH,
     GET_USERS_SUCCESS,
     GET_USERS_FAILURE,
@@ -59,12 +60,23 @@ export interface GetCurrentUserError {
     payload: GetUsersError,
 }
 
+export interface GetDataByFilterFetch {
+    type: typeof GET_DATA_BY_FILTER_FETCH,
+    payload: {
+        field: string;
+        value: string;
+        page?: number;
+        limit?: number;
+    }
+}
+
 export type UsersAction = GetUsersFetch
     | GetUsersFailed
     | GetUsersSuccess
     | GetCurrentUserFetch
     | GetCurrentUserData
-    | GetCurrentUserError;
+    | GetCurrentUserError
+    | GetDataByFilterFetch;
 
 export const getUsers = (payload: GetUsersFetch['payload']): GetUsersFetch => ({
     type: GET_USERS_FETCH,
@@ -92,5 +104,10 @@ export const getCurrentUserData = (payload: GetCurrentUserData['payload']): GetC
 
 export const getCurrentUserError = (payload: GetCurrentUserError['payload']): GetCurrentUserError => ({
     type: GET_CURRENT_USER_ERROR,
+    payload,
+});
+
+export const getDataByFilter = (payload: GetDataByFilterFetch['payload']): GetDataByFilterFetch => ({
+    type: GET_DATA_BY_FILTER_FETCH,
     payload,
 });
