@@ -51,6 +51,7 @@ interface UserInfoState {
     orderBy: string;
     page: number;
     rowsPerPage: number;
+    showMore: boolean;
 }
 
 type Props = ReduxProps & DispatchProps & RouteProps & OwnProps;
@@ -69,6 +70,7 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
             orderBy: this.documentsRows[0].key,
             page: 0,
             rowsPerPage: 15,
+            showMore: false,
         };
     }
 
@@ -107,11 +109,11 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
                             changeLabelName={this.changeNameForNewLabel}
                             changeLabelScope={this.changeScopeForNewLabel}
                             changeLabelValue={this.changeValueForNewLabel}
-                            changeState={this.changeState}
-                            changeRole={this.changeRole}
-                            changeOTP={this.changeOTP}
                             closeModal={this.handleCloseModal}
                             deleteUserLabel={this.deleteLabel}
+                            handleChangeUserState={this.handleChangeUserState}
+                            handleChangeRole={this.handleChangeRole}
+                            handleChangeUserOTP={this.handleСhangeUserOTP}
                             newLabelName={nameLabel}
                             newLabelScope={scopeLabel}
                             newLabelValue={valueLabel}
@@ -125,6 +127,8 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
                             page={page}
                             rowsPerPage={rowsPerPage}
                             handleChangePage={this.handleChangePage}
+                            showMore={this.state.showMore}
+                            showMoreUserInfo={this.showMoreUserInfo}
                         />
                     ) : 'Loading'
                 }
@@ -210,20 +214,28 @@ class UserInfoScreen extends React.Component<Props, UserInfoState> {
         this.changeValueForNewLabel('');
     };
 
-
-    private changeState = (value: string) => {
+    private handleChangeUserState = (e: any) => {
         const { uid } = this.props.userData;
-        this.props.changeUserState({uid: uid, state: value});
+        this.props.changeUserState({uid: uid, state : e.target.value});
+
     };
 
-    private changeRole = (value: string) => {
+    private handleChangeRole = (e: any) => {
         const { uid } = this.props.userData;
-        this.props.changeUserRole({uid: uid, role: value});
+        this.props.changeUserRole({uid: uid, role: e.target.value});
     };
 
-    private changeOTP = (value: boolean) => {
-        const { uid } = this.props.userData;
-        this.props.changeUserOTP({uid: uid, otp: value});
+    private handleChangeUserOTP = (e: any) => {
+        if(!e.target.checked){
+            const { uid } = this.props.userData;
+            this.props.changeUserOTP({uid: uid, otp: e.target.checked});
+        } else {
+            alert('2FA can only be enabled by the user');
+        }
+    };
+
+    private showMoreUserInfo = (e: any) => {
+        this.setState({ showMore: !this.state.showMore });
     };
 
     private handleChangePage = (page: number) => {
